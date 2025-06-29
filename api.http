@@ -1,0 +1,31 @@
+### Recuperar todas las peliculas
+
+GET http://localhost:1234/movies
+
+### Recuperar una pelicula por id
+
+GET http://localhost:1234/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+
+### Recuperar peliculas por genero
+
+GET http://localhost:1234/movies?genre=Action
+
+### Crear pelicula con POST
+
+POST http://localhost:1234/movies
+Content-Type: application/json
+
+{
+  "title": 33,
+  "year": 2023,
+  "genre": "Action",
+  "director": "John Doe",
+  "poster": "https://example.com/poster.jpg",
+  "duration": 120
+
+}
+
+
+### Actualizar pelicula con PATCH
+
+PATCH http://localhost:1234/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
