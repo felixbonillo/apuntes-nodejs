@@ -63,11 +63,16 @@ app.post("/movies", (req, res) => {
   res.status(201).json(newMovie);
 });
 
+// Ruta para manejar la actualización de una película existente
 app.patch("/movies/:id", (req, res) => {
-  const { id } = req.params; // Obtiene el parámetro de ruta "id"
-  const movieIndex = movies.findIndex((movie) => movie.id === id); // Busca el índice de la película por su ID
+  const { id } = req.params; // Obtiene el ID de la película a actualizar
+  const movieIndex = movies.findIndex((movie) => movie.id === id); // Busca el índice de la película
 
-} // Ruta para manejar la actualización de una película existente
+  if (movieIndex === -1) {
+    // Si no se encuentra la película, responde con un error 404
+    return res.status(404).json({ message: "Pelicula no encontrada" });
+  }
+});
 
 
 // Definir el puerto en el que el servidor escuchará (por defecto 1234 si no está definido en las variables de entorno)
