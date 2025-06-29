@@ -20,7 +20,7 @@ app.get("/movies", (req, res) => {
     // Filtra las películas por género si se proporciona el parámetro
     const filteredMovies = movies.filter(
       (movie) =>
-        movie.genre.some( g => g.toLowerCase() === genre.toLowerCase()) // Compara ignorando mayúsculas/minúsculas
+        movie.genre.some((g) => g.toLowerCase() === genre.toLowerCase()) // Compara ignorando mayúsculas/minúsculas
     );
     return res.json(filteredMovies); // Responde con las películas filtradas
   }
@@ -53,7 +53,7 @@ app.post("/movies", (req, res) => {
   // Crear un nuevo objeto de película con un ID único y los datos validados
   const newMovie = {
     id: crypto.randomUUID(), // Generar un identificador único para la película
-    ...result.data // Usar los datos validados
+    ...result.data, // Usar los datos validados
   };
 
   // Agregar la nueva película al arreglo en memoria
@@ -66,6 +66,15 @@ app.post("/movies", (req, res) => {
 // Ruta para manejar la actualización de una película existente
 app.patch("/movies/:id", (req, res) => {
   const { id } = req.params; // Obtiene el ID de la película a actualizar
+
+  const result = validateMovie(req.body); // Valida los datos enviados en el cuerpo de la solicitud
+  if (!result.success) {
+    // Si hay errores de validación, responde con un error 400
+    return res.status(400).json({
+      message: "Error de validación",
+      errors: JSON.parse(result.error.message), // Detalles específicos de los errores
+    });
+  }
   const movieIndex = movies.findIndex((movie) => movie.id === id); // Busca el índice de la película
 
   if (movieIndex === -1) {
@@ -73,7 +82,6 @@ app.patch("/movies/:id", (req, res) => {
     return res.status(404).json({ message: "Pelicula no encontrada" });
   }
 });
-
 
 // Definir el puerto en el que el servidor escuchará (por defecto 1234 si no está definido en las variables de entorno)
 const PORT = process.env.PORT || 1234;
