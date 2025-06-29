@@ -1,7 +1,7 @@
 const express = require("express"); // Importa el módulo Express para crear el servidor
 const movies = require("./movies.json"); // Carga el archivo JSON con las películas
 const crypto = require("node:crypto"); // Importa el módulo crypto para generar identificadores únicos
-const { validateMovie } = require("./schemas/movies"); // Importa la función de validación de películas
+const { validateMovie, validatePartialMovie } = require("./schemas/movies"); // Importa la función de validación de películas
 
 const app = express(); // Crea una instancia de la aplicación Express
 app.use(express.json()); // Middleware para parsear el cuerpo de las solicitudes como JSON
@@ -65,9 +65,8 @@ app.post("/movies", (req, res) => {
 
 // Ruta para manejar la actualización de una película existente
 app.patch("/movies/:id", (req, res) => {
-  const { id } = req.params; // Obtiene el ID de la película a actualizar
-
-  const result = validateMovie(req.body); // Valida los datos enviados en el cuerpo de la solicitud
+  
+  const result = validatePartialMovie(req.body); // Valida los datos enviados en el cuerpo de la solicitud
   if (!result.success) {
     // Si hay errores de validación, responde con un error 400
     return res.status(400).json({
@@ -75,12 +74,23 @@ app.patch("/movies/:id", (req, res) => {
       errors: JSON.parse(result.error.message), // Detalles específicos de los errores
     });
   }
-  const movieIndex = movies.findIndex((movie) => movie.id === id); // Busca el índice de la película
+  const { id } = req.params; // Obtiene el ID de la película a actualizar
+
+  const movieIndex = movies.findIndex(movie => movie.id === id); // Busca el índice de la película
 
   if (movieIndex === -1) {
     // Si no se encuentra la película, responde con un error 404
     return res.status(404).json({ message: "Pelicula no encontrada" });
   }
+
+  // Actualiza la película en el arreglo en memoria
+  const updateMovie = {
+    ...movies[movieIndex], // Mantiene los datos existentes de la película
+    ...result.data // Actualiza con los nuevos datos validados
+  }
+
+  movies[movieIndex] = updateMovie; // Reemplaza la película en el arreglo
+  res.json(updateMovie); // Responde con la película actualizada
 });
 
 // Definir el puerto en el que el servidor escuchará (por defecto 1234 si no está definido en las variables de entorno)

@@ -33,4 +33,4 @@ function validatePartialMovie (object) {
   return movieSchema.partial().safeParse(object);
 }
 
-module.exports = { validateMovie };
+module.exports = { validateMovie, validatePartialMovie };
